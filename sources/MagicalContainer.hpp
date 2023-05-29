@@ -1,11 +1,13 @@
 #ifndef MAGICAL_CONTAINER_HPP
 #define MAGICAL_CONTAINER_HPP
+
 #include <iostream>
-using namespace std;
 #include <vector>
 
 namespace ariel
 {
+    using namespace std;
+
     class MagicalContainer
     {
         class Iterator

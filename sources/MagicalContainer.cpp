@@ -1,49 +1,228 @@
-#include <vector>
 #include "MagicalContainer.hpp"
-#include "Iterator.hpp"
+#include <algorithm>
 
 namespace ariel
 {
-    using namespace std;
+    MagicalContainer::MagicalContainer()
+    {
+        elements = vector<int>();
+        iterators = vector<Iterator *>();
+    }
 
-    MagicalContainer() {}
-    MagicalContainer(const MagicalContainer &other) : container(other.container) {}
-    ~MagicalContainer() {}
+    MagicalContainer::~MagicalContainer()
+    {
+    }
 
-    void push_back(int element)
+    bool MagicalContainer::addElement(int newElement)
     {
-        container.push_back(element);
+        elements.push_back(newElement);
+        return true;
     }
-    void pop_back()
+
+    bool MagicalContainer::removeElement(int element)
     {
-        container.pop_back();
-    }
-    int size()
-    {
-        return container.size();
-    }
-    int getElement(int index)
-    {
-        return container[index];
-    }
-    void setElement(int index, int element)
-    {
-        container[index] = element;
-    }
-    void print()
-    {
-        for (int i = 0; i < container.size(); i++)
+        for (auto currElement : elements)
         {
-            cout << container[i] << ", ";
+            if (currElement == element)
+            {
+                elements.erase(std::find(elements.begin(), elements.end(), element));
+                return true;
+            }
         }
-        cout << endl;
+        return false;
     }
-    void erase(int index)
+
+    int MagicalContainer::size() const
     {
-        container.erase(container.begin() + index);
+        return elements.size();
     }
-    void clear()
+
+    MagicalContainer::AscendingIterator::AscendingIterator() {}
+
+    MagicalContainer::AscendingIterator::AscendingIterator(MagicalContainer &container)
+        : container(&container), sortedElements(container.elements)
     {
-        container.clear();
+        this->currElement = &sortedElements[0];
+        container.iterators.push_back(this);
+    }
+
+    MagicalContainer::AscendingIterator::AscendingIterator(const AscendingIterator &other)
+        : container(other.container), sortedElements(other.sortedElements), currElement(other.currElement)
+    {
+        other.container->iterators.push_back(this);
+    }
+
+    MagicalContainer::AscendingIterator::~AscendingIterator()
+    {
+    }
+
+    MagicalContainer::AscendingIterator &MagicalContainer::AscendingIterator::operator=(const AscendingIterator &other)
+    {
+        sortedElements = other.sortedElements;
+        container = other.container;
+        return *this;
+    }
+
+    int &MagicalContainer::AscendingIterator::operator*()
+    {
+        return *currElement;
+    }
+
+    MagicalContainer::AscendingIterator &MagicalContainer::AscendingIterator::operator++()
+    {
+        ++currElement;
+        return *this;
+    }
+
+    bool MagicalContainer::AscendingIterator::operator==(const AscendingIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::AscendingIterator::operator!=(const AscendingIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::AscendingIterator::operator<(const AscendingIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::AscendingIterator::operator>(const AscendingIterator &other) const
+    {
+        return false;
+    }
+
+    MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin()
+    {
+        return AscendingIterator();
+    }
+
+    MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::end()
+    {
+        return AscendingIterator();
+    }
+
+    MagicalContainer::SideCrossIterator::SideCrossIterator()
+    {
+    }
+
+    MagicalContainer::SideCrossIterator::SideCrossIterator(MagicalContainer &container)
+    {
+    }
+
+    MagicalContainer::SideCrossIterator::SideCrossIterator(const SideCrossIterator &other)
+    {
+    }
+
+    MagicalContainer::SideCrossIterator::~SideCrossIterator()
+    {
+    }
+
+    MagicalContainer::SideCrossIterator &MagicalContainer::SideCrossIterator::operator=(const SideCrossIterator &other)
+    {
+        return *this;
+    }
+
+    int &MagicalContainer::SideCrossIterator::operator*()
+    {
+        return *currElement;
+    }
+
+    MagicalContainer::SideCrossIterator &MagicalContainer::SideCrossIterator::operator++()
+    {
+        return *this;
+    }
+
+    bool MagicalContainer::SideCrossIterator::operator==(const SideCrossIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::SideCrossIterator::operator!=(const SideCrossIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::SideCrossIterator::operator<(const SideCrossIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::SideCrossIterator::operator>(const SideCrossIterator &other) const
+    {
+        return false;
+    }
+
+    MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::begin()
+    {
+        return SideCrossIterator();
+    }
+
+    MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end()
+    {
+        return SideCrossIterator();
+    }
+
+    MagicalContainer::PrimeIterator::PrimeIterator()
+    {
+    }
+
+    MagicalContainer::PrimeIterator::PrimeIterator(MagicalContainer &container)
+    {
+    }
+
+    MagicalContainer::PrimeIterator::PrimeIterator(const PrimeIterator &other)
+    {
+    }
+
+    MagicalContainer::PrimeIterator::~PrimeIterator()
+    {
+    }
+
+    MagicalContainer::PrimeIterator &MagicalContainer::PrimeIterator::operator=(const PrimeIterator &other)
+    {
+        return *this;
+    }
+
+    int &MagicalContainer::PrimeIterator::operator*()
+    {
+        return *currElement;
+    }
+
+    MagicalContainer::PrimeIterator &MagicalContainer::PrimeIterator::operator++()
+    {
+        return *this;
+    }
+
+    bool MagicalContainer::PrimeIterator::operator==(const PrimeIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::PrimeIterator::operator!=(const PrimeIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::PrimeIterator::operator<(const PrimeIterator &other) const
+    {
+        return false;
+    }
+
+    bool MagicalContainer::PrimeIterator::operator>(const PrimeIterator &other) const
+    {
+        return false;
+    }
+
+    MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::begin()
+    {
+        return PrimeIterator();
+    }
+
+    MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::end()
+    {
+        return PrimeIterator();
     }
 }

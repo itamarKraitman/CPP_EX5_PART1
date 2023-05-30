@@ -3,10 +3,14 @@
 
 namespace ariel
 {
+    MagicalContainer::Iterator::Iterator() {}
+
     MagicalContainer::MagicalContainer()
     {
         elements = vector<int>();
-        iterators = vector<Iterator *>();
+        ascendingIterator = AscendingIterator(*this);
+        sideCrossIterator = SideCrossIterator(*this);
+        primeIterator = PrimeIterator(*this);
     }
 
     MagicalContainer::~MagicalContainer()
@@ -32,24 +36,42 @@ namespace ariel
         return false;
     }
 
+    std::vector<int> MagicalContainer::getElements() const
+    {
+        return this->elements;
+    }
+
     int MagicalContainer::size() const
     {
         return elements.size();
     }
 
+    MagicalContainer::AscendingIterator &MagicalContainer::getAscendingIterator()
+    {
+        return this->ascendingIterator;
+    }
+
+    MagicalContainer::SideCrossIterator &MagicalContainer::getSideCrossIterator()
+    {
+        return this->sideCrossIterator;
+    }
+
+    MagicalContainer::PrimeIterator &MagicalContainer::getPrimeIterator()
+    {
+        return this->primeIterator;
+    }
+
     MagicalContainer::AscendingIterator::AscendingIterator() {}
 
     MagicalContainer::AscendingIterator::AscendingIterator(MagicalContainer &container)
-        : container(&container), sortedElements(container.elements)
+        : Iterator(), container(&container), sortedElements(container.elements)
     {
         this->currElement = &sortedElements[0];
-        container.iterators.push_back(this);
     }
 
     MagicalContainer::AscendingIterator::AscendingIterator(const AscendingIterator &other)
         : container(other.container), sortedElements(other.sortedElements), currElement(other.currElement)
     {
-        other.container->iterators.push_back(this);
     }
 
     MagicalContainer::AscendingIterator::~AscendingIterator()
@@ -94,15 +116,17 @@ namespace ariel
         return false;
     }
 
-    MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::begin()
+    std::vector<int>::iterator MagicalContainer::AscendingIterator::begin()
     {
-        return AscendingIterator();
+        return this->sortedElements.begin();
     }
 
-    MagicalContainer::AscendingIterator MagicalContainer::AscendingIterator::end()
+    std::vector<int>::iterator MagicalContainer::AscendingIterator::end()
     {
-        return AscendingIterator();
+        return this->sortedElements.end();
     }
+
+    MagicalContainer::AscendingIterator &MagicalContainer::AscendingIterator::operator=(AscendingIterator &&other) noexcept {return *this;}
 
     MagicalContainer::SideCrossIterator::SideCrossIterator()
     {
@@ -155,15 +179,18 @@ namespace ariel
         return false;
     }
 
-    MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::begin()
+    std::vector<int>::iterator MagicalContainer::SideCrossIterator::begin()
     {
-        return SideCrossIterator();
+        return this->sortedElements.begin();
     }
 
-    MagicalContainer::SideCrossIterator MagicalContainer::SideCrossIterator::end()
+    std::vector<int>::iterator MagicalContainer::SideCrossIterator::end()
     {
-        return SideCrossIterator();
+        return this->sortedElements.end();
     }
+
+    MagicalContainer::SideCrossIterator &MagicalContainer::SideCrossIterator::operator=(SideCrossIterator &&other) noexcept {return *this;}
+
 
     MagicalContainer::PrimeIterator::PrimeIterator()
     {
@@ -216,13 +243,18 @@ namespace ariel
         return false;
     }
 
-    MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::begin()
+    std::vector<int>::iterator MagicalContainer::PrimeIterator::begin()
     {
-        return PrimeIterator();
+        return this->primeElements.begin();
     }
 
-    MagicalContainer::PrimeIterator MagicalContainer::PrimeIterator::end()
+    std::vector<int>::iterator MagicalContainer::PrimeIterator::end()
     {
-        return PrimeIterator();
+        return this->primeElements.end();
     }
+
+    MagicalContainer::PrimeIterator &MagicalContainer::PrimeIterator::operator=(PrimeIterator &&other) noexcept {return *this;}
+
+
+    
 }

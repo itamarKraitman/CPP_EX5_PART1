@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 namespace ariel
 {
@@ -13,21 +14,21 @@ namespace ariel
         class Iterator
         {
         public:
-            int* currElement;
+            int *currElement;
+            Iterator();
             virtual ~Iterator() = default;
             virtual int &operator*() = 0;
             virtual Iterator &operator++() = 0;
+            virtual std::vector<int>::iterator begin() = 0;
+            virtual std::vector<int>::iterator end() = 0;
+
+            Iterator(const Iterator &other) = delete;
+            Iterator &operator=(const Iterator &other) = delete;
+            Iterator(Iterator &&other) noexcept = delete;
+            Iterator &operator=(Iterator &&other) noexcept = delete;
         };
 
-        vector<int> elements;
-        vector<Iterator*> iterators; 
     public:
-        MagicalContainer();
-        ~MagicalContainer();
-        bool addElement(int element);
-        bool removeElement(int element);
-        int size() const;
-
         class AscendingIterator : public Iterator
         {
         private:
@@ -39,7 +40,7 @@ namespace ariel
             AscendingIterator();
             AscendingIterator(MagicalContainer &container);
             AscendingIterator(const AscendingIterator &other);
-            ~AscendingIterator();
+            ~AscendingIterator() override;
 
             AscendingIterator &operator=(const AscendingIterator &other);
             bool operator==(const AscendingIterator &other) const;
@@ -49,8 +50,11 @@ namespace ariel
             int &operator*() override;
             AscendingIterator &operator++() override;
 
-            AscendingIterator begin();
-            AscendingIterator end();
+            std::vector<int>::iterator begin() override;
+            std::vector<int>::iterator end() override;
+
+            AscendingIterator(AscendingIterator &&other) noexcept;
+            AscendingIterator &operator=(AscendingIterator &&other) noexcept;
         };
 
         class SideCrossIterator : public Iterator
@@ -64,7 +68,7 @@ namespace ariel
             SideCrossIterator();
             SideCrossIterator(MagicalContainer &container);
             SideCrossIterator(const SideCrossIterator &other);
-            ~SideCrossIterator();
+            ~SideCrossIterator() override;
 
             SideCrossIterator &operator=(const SideCrossIterator &other);
             bool operator==(const SideCrossIterator &other) const;
@@ -73,23 +77,39 @@ namespace ariel
             bool operator>(const SideCrossIterator &other) const;
             int &operator*() override;
             SideCrossIterator &operator++() override;
-            
-            SideCrossIterator begin();
-            SideCrossIterator end();
+
+            std::vector<int>::iterator begin() override;
+            std::vector<int>::iterator end() override;
+
+            SideCrossIterator(SideCrossIterator &&other) noexcept;
+            SideCrossIterator &operator=(SideCrossIterator &&other) noexcept;
         };
 
         class PrimeIterator : public Iterator
         {
         private:
-            vector<int> sortedElements;
+            vector<int> primeElements;
             MagicalContainer *container;
             int *currElement;
+
+            static bool isPrime(int num)
+            {
+                double sqrtNum = sqrt(num);
+                for (int i = 2; i <= sqrtNum; i++)
+                {
+                    if (num % i == 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
 
         public:
             PrimeIterator();
             PrimeIterator(MagicalContainer &container);
             PrimeIterator(const PrimeIterator &other);
-            ~PrimeIterator();
+            ~PrimeIterator() override;
 
             PrimeIterator &operator=(const PrimeIterator &other);
             bool operator==(const PrimeIterator &other) const;
@@ -99,9 +119,33 @@ namespace ariel
             int &operator*() override;
             PrimeIterator &operator++() override;
 
-            PrimeIterator begin();
-            PrimeIterator end();
+            std::vector<int>::iterator begin() override;
+            std::vector<int>::iterator end() override;
+
+            PrimeIterator(PrimeIterator &&other) noexcept;
+            PrimeIterator &operator=(PrimeIterator &&other) noexcept;
         };
+
+        vector<int> elements;
+        AscendingIterator ascendingIterator;
+        SideCrossIterator sideCrossIterator;
+        PrimeIterator primeIterator;
+
+        MagicalContainer();
+        ~MagicalContainer();
+        bool addElement(int element);
+        bool removeElement(int element);
+        std::vector<int> getElements() const;
+        int size() const;
+
+        AscendingIterator &getAscendingIterator();
+        SideCrossIterator &getSideCrossIterator();
+        PrimeIterator &getPrimeIterator();
+
+        MagicalContainer(const MagicalContainer &other) = delete;
+        MagicalContainer &operator=(const MagicalContainer &other) = delete;
+        MagicalContainer(MagicalContainer &&other) noexcept = delete;
+        MagicalContainer &operator=(MagicalContainer &&other) noexcept = delete;
     };
 }
 #endif

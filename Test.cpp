@@ -89,6 +89,11 @@ TEST_SUITE("Iterators")
         container.addElement(5);
         container.addElement(14);
 
+        SUBCASE("Adding duplicate elements")
+        {
+            CHECK_FALSE_MESSAGE(container.addElement(14), "Can't add duplicate elements");
+        }
+
         MagicalContainer::AscendingIterator ascIter = container.getAscendingIterator();
 
         SUBCASE("Iterating over elements")
@@ -122,14 +127,18 @@ TEST_SUITE("Iterators")
         {
             CHECK(ascIter.begin() + 3 > ascIter.begin() + 1);
             CHECK(ascIter.begin() + 4 > ascIter.begin());
+            CHECK(ascIter.end() > ascIter.begin() + 1);
+            CHECK(ascIter.end() > ascIter.begin());
             CHECK_FALSE(ascIter.begin() > ascIter.begin() + 1);
         }
 
         SUBCASE("< operator")
         {
-            CHECK(ascIter.begin() + 1 > ascIter.begin() + 3);
-            CHECK(ascIter.begin() > ascIter.begin() + 4);
-            CHECK_FALSE(ascIter.begin() + 1 > ascIter.begin());
+            CHECK(ascIter.begin() + 1 < ascIter.begin() + 3);
+            CHECK(ascIter.begin() + 3 < ascIter.begin() + 4);
+            CHECK(ascIter.begin() + 2 < ascIter.end());
+            CHECK(ascIter.begin() + 2 < ascIter.end());
+            CHECK_FALSE(ascIter.begin() + 1 < ascIter.begin());
         }
 
         SUBCASE("=, ==, and != operators")
@@ -146,6 +155,21 @@ TEST_SUITE("Iterators")
 
             // !=
             CHECK_FALSE(otherAscIter != ascIter);
+            MagicalContainer container2;
+            MagicalContainer::AscendingIterator other = MagicalContainer::AscendingIterator(container2);
+            bool areEqual = false;
+            CHECK_THROWS_AS(areEqual = (other == ascIter), std::runtime_error); // iterators with different containers
+        }
+
+        SUBCASE("++ operator")
+        {
+            MagicalContainer::AscendingIterator otherAscIter = MagicalContainer::AscendingIterator(container);
+            auto it = otherAscIter.begin();
+            while (it != otherAscIter.end())
+            {
+                CHECK_NOTHROW(++it);
+            }
+            CHECK_THROWS_AS(++it, std::out_of_range); // not at end()
         }
     }
 
@@ -181,42 +205,58 @@ TEST_SUITE("Iterators")
             CHECK(other.begin() + 2 == scIter.begin() + 2);
             CHECK(other.begin() + 3 == scIter.begin() + 3);
             CHECK(other.end() == scIter.end());
+        }
 
-            // nullptr
-            MagicalContainer::SideCrossIterator nullIter;
-            CHECK_THROWS_AS(MagicalContainer::SideCrossIterator other2(nullIter), std::nullptr_t);
+        // nullptr
+        MagicalContainer::SideCrossIterator nullIter;
+        CHECK_THROWS_AS(MagicalContainer::SideCrossIterator other2(nullIter), std::nullptr_t);
 
-            SUBCASE("> operator")
+        SUBCASE("> operator")
+        {
+            CHECK(scIter.begin() + 3 > scIter.begin() + 1);
+            CHECK(scIter.begin() + 2 > scIter.begin());
+            CHECK(scIter.begin() + 4 > scIter.begin() + 1);
+            CHECK(scIter.end() > scIter.begin() + 1);
+            CHECK_FALSE(scIter.begin() > scIter.begin() + 1);
+        }
+
+        SUBCASE("< operator")
+        {
+            CHECK(scIter.begin() + 1 < scIter.begin() + 3);
+            CHECK(scIter.begin() < scIter.begin() + 2);
+            CHECK(scIter.begin() + 1 < scIter.begin() + 4);
+            CHECK(scIter.begin() + 1 < scIter.end());
+            CHECK_FALSE(scIter.begin() + 1 < scIter.begin());
+        }
+
+        SUBCASE("=, ==, and != operators")
+        {
+            MagicalContainer::SideCrossIterator otherScIter = MagicalContainer::SideCrossIterator(container);
+
+            CHECK_NOTHROW(otherScIter = scIter);
+
+            // self assignmnet
+            CHECK_THROWS_AS(scIter = scIter, std::runtime_error);
+
+            // ==
+            CHECK(otherScIter == scIter);
+            MagicalContainer container2;
+            MagicalContainer::SideCrossIterator other = MagicalContainer::SideCrossIterator(container2);
+            bool areEqual = false;
+            CHECK_THROWS_AS(areEqual = (other == scIter), std::runtime_error); // iterators with different containers
+
+            // !=
+            CHECK_FALSE(otherScIter != scIter);
+        }
+         SUBCASE("++ operator")
+        {
+            MagicalContainer::SideCrossIterator otherScIter = MagicalContainer::SideCrossIterator(container);
+            auto it = otherScIter.begin();
+            while (it != otherScIter.end())
             {
-                CHECK(scIter.begin() + 3 > scIter.begin() + 1);
-                CHECK(scIter.begin() + 2 > scIter.begin());
-                CHECK(scIter.begin() + 4 > scIter.begin() + 1);
-                CHECK_FALSE(scIter.begin() > scIter.begin() + 1);
+                CHECK_NOTHROW(++it);
             }
-
-            SUBCASE("< operator")
-            {
-                CHECK(scIter.begin() + 1 > scIter.begin() + 3);
-                CHECK(scIter.begin() > scIter.begin() + 2);
-                CHECK(scIter.begin() + 1 > scIter.begin() + 4);
-                CHECK_FALSE(scIter.begin() + 1 > scIter.begin());
-            }
-
-            SUBCASE("=, ==, and != operators")
-            {
-                MagicalContainer::SideCrossIterator otherScIter = MagicalContainer::SideCrossIterator(container);
-
-                CHECK_NOTHROW(otherScIter = scIter);
-
-                // self assignmnet
-                CHECK_THROWS_AS(scIter = scIter, std::runtime_error);
-
-                // ==
-                CHECK(otherScIter == scIter);
-
-                // !=
-                CHECK_FALSE(otherScIter != scIter);
-            }
+            CHECK_THROWS_AS(++it, std::out_of_range); // not at end()
         }
     }
 
@@ -244,13 +284,13 @@ TEST_SUITE("Iterators")
             CHECK_EQ(actual, expected);
         }
 
-         SUBCASE("Copy constructor")
+        SUBCASE("Copy constructor")
         {
             MagicalContainer::PrimeIterator other(primeIter);
             CHECK(other.begin() == primeIter.begin());
-            CHECK(other.begin() + 1 == primeIter.begin() + 1);  
-            CHECK(other.begin() + 2 == primeIter.begin() + 2);  
-            CHECK(other.begin() + 3 == primeIter.begin() + 3);  
+            CHECK(other.begin() + 1 == primeIter.begin() + 1);
+            CHECK(other.begin() + 2 == primeIter.begin() + 2);
+            CHECK(other.begin() + 3 == primeIter.begin() + 3);
             CHECK(other.end() == primeIter.end());
 
             // nullptr
@@ -261,12 +301,14 @@ TEST_SUITE("Iterators")
         SUBCASE("> operator")
         {
             CHECK(primeIter.begin() + 1 > primeIter.begin());
+            CHECK(primeIter.end() > primeIter.begin() + 2);
             CHECK_FALSE(primeIter.begin() > primeIter.begin() + 1);
         }
 
         SUBCASE("< operator")
         {
             CHECK(primeIter.begin() > primeIter.begin() + 1);
+            CHECK(primeIter.begin() < primeIter.end());
             CHECK_FALSE(primeIter.begin() + 1 > primeIter.begin());
         }
 
@@ -284,6 +326,21 @@ TEST_SUITE("Iterators")
 
             // !=
             CHECK_FALSE(otherPrimeIter != primeIter);
+            MagicalContainer container2;
+            MagicalContainer::PrimeIterator other = MagicalContainer::PrimeIterator(container2);
+            bool areEqual = false;
+            CHECK_THROWS_AS(areEqual = (other == primeIter), std::runtime_error); // iterators with different containers
+        }
+
+        SUBCASE("++ operator")
+        {
+            MagicalContainer::PrimeIterator otherPrimeIter = MagicalContainer::PrimeIterator(container);
+            auto it = otherPrimeIter.begin();
+            while (it != otherPrimeIter.end())
+            {
+                CHECK_NOTHROW(++it);
+            }
+            CHECK_THROWS_AS(++it, std::out_of_range); // not at end()
         }
     }
 }

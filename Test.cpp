@@ -109,6 +109,15 @@ TEST_SUITE("Iterators")
             CHECK_EQ(actual, expected);
         }
 
+        SUBCASE("Adding or removing elements during interating should raise an error")
+        {
+            MagicalContainer::AscendingIterator otherAscIter = MagicalContainer::AscendingIterator(container);
+            auto it = otherAscIter.begin();
+            ++it;
+            CHECK_THROWS_AS(container.addElement(10), std::runtime_error);
+            CHECK_THROWS_AS(container.removeElement(2), std::runtime_error);
+        }
+
         SUBCASE("Copy constructor")
         {
             MagicalContainer::AscendingIterator other(ascIter);
@@ -197,6 +206,14 @@ TEST_SUITE("Iterators")
             CHECK_EQ(actual, expected);
         }
 
+        SUBCASE("Adding or removing elements during interating should raise an error")
+        {
+            auto it = scIter.begin();
+            ++it;
+            CHECK_THROWS_AS(container.addElement(10), std::runtime_error);
+            CHECK_THROWS_AS(container.removeElement(2), std::runtime_error);
+        }
+
         SUBCASE("Copy constructor")
         {
             MagicalContainer::SideCrossIterator other(scIter);
@@ -248,7 +265,7 @@ TEST_SUITE("Iterators")
             // !=
             CHECK_FALSE(otherScIter != scIter);
         }
-         SUBCASE("++ operator")
+        SUBCASE("++ operator")
         {
             MagicalContainer::SideCrossIterator otherScIter = MagicalContainer::SideCrossIterator(container);
             auto it = otherScIter.begin();
@@ -282,6 +299,14 @@ TEST_SUITE("Iterators")
             }
 
             CHECK_EQ(actual, expected);
+        }
+
+        SUBCASE("Adding or removing elements during interating should raise an error")
+        {
+            auto it = primeIter.begin();
+            ++it;
+            CHECK_THROWS_AS(container.addElement(10), std::runtime_error);
+            CHECK_THROWS_AS(container.removeElement(2), std::runtime_error);
         }
 
         SUBCASE("Copy constructor")
